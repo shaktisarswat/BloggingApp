@@ -3,9 +3,9 @@ package com.spring.blog.controllers;
 
 import com.spring.blog.dto.ApiResponse;
 import com.spring.blog.dto.PostDto;
+import com.spring.blog.dto.PostResponse;
 import com.spring.blog.services.PostService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -50,16 +50,12 @@ public class PostController {
     }
 
     // get all posts
-//	@GetMapping("/posts")
-//	public ResponseEntity<PostResponse> getAllPost(
-//			@RequestParam(value = "pageNumber", defaultValue = AppConstants.PAGE_NUMBER, required = false) Integer pageNumber,
-//			@RequestParam(value = "pageSize", defaultValue = AppConstants.PAGE_SIZE, required = false) Integer pageSize,
-//			@RequestParam(value = "sortBy", defaultValue = AppConstants.SORT_BY, required = false) String sortBy,
-//			@RequestParam(value = "sortDir", defaultValue = AppConstants.SORT_DIR, required = false) String sortDir) {
-//
-//		PostResponse postResponse = this.postService.getAllPost(pageNumber, pageSize, sortBy, sortDir);
-//		return new ResponseEntity<PostResponse>(postResponse, HttpStatus.OK);
-//	}
+    @GetMapping("/posts")
+    public ResponseEntity<PostResponse> getAllPost(@RequestParam(value = "pageNumber", defaultValue = "1", required = false) Integer pageNumber, @RequestParam(value = "pageSize", defaultValue = "5", required = false) Integer pageSize, @RequestParam(value = "sortBy", defaultValue = "postId", required = false) String sortBy, @RequestParam(value = "sortDir", defaultValue = "asc", required = false) String sortDir) {
+
+        PostResponse postResponse = this.postService.getAllPost(pageNumber, pageSize, sortBy, sortDir);
+        return new ResponseEntity<PostResponse>(postResponse, HttpStatus.OK);
+    }
 
     // get post details by id
     @GetMapping("/posts/{postId}")
