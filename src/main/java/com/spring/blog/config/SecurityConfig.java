@@ -31,7 +31,7 @@ import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 public class SecurityConfig {
 
-    public static final String[] PUBLIC_URLS = {"/api/v1/auth/**", "/v3/api-docs", "/v2/api-docs",
+    public static final String[] PUBLIC_URLS = { "/v3/api-docs", "/v2/api-docs",
             "/swagger-resources/**", "/swagger-ui/**", "/webjars/**"
 
     };
@@ -50,7 +50,8 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .authorizeRequests(authorizeRequests ->
-                        authorizeRequests
+                        authorizeRequests.
+                                requestMatchers(PUBLIC_URLS).permitAll()
                                 .requestMatchers("/bloggingapp/login").permitAll()
                                 .requestMatchers("/bloggingapp/**").authenticated()
                 )
