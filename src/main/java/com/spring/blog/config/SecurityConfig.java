@@ -8,10 +8,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -48,27 +46,21 @@ public class SecurityConfig {
     private JwtAuthenticationFilter jwtAuthenticationFilter;
 
 
-
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-//        http.
-//                authorizeHttpRequests()
-//                .requestMatchers("/bloggingapp/**").permitAll()
-//                .anyRequest().authenticated()
-//                .and().exceptionHandling()
-//                .authenticationEntryPoint(this.jwtAuthenticationEntryPoint)
-//                .and()
-//                .sessionManagement()
-//                .sessionCreationPolicy(SessionCreationPolicy.STATELESS);
-
-        http.securityMatcher("/api/**").authorizeHttpRequests(rmr -> rmr
-                .requestMatchers("/bloggingapp/login").permitAll()
-                .requestMatchers("/api/**").authenticated()
-        ).httpBasic(httpbc -> httpbc
-                .authenticationEntryPoint(jwtAuthenticationEntryPoint)
-        ).sessionManagement(smc -> smc
-                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-        );
+        http
+                .authorizeRequests(authorizeRequests ->
+                        authorizeRequests
+                                .requestMatchers("/bloggingapp/login").permitAll()
+                                .requestMatchers("/bloggingapp/**").authenticated()
+                )
+                .httpBasic(httpBasicConfigurer ->
+                        httpBasicConfigurer.authenticationEntryPoint(jwtAuthenticationEntryPoint)
+                )
+                .sessionManagement(sessionManagementConfigurer ->
+                        sessionManagementConfigurer.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                )
+                .csrf().disable();
 
         http.addFilterBefore(this.jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
         http.authenticationProvider(daoAuthenticationProvider());
@@ -76,56 +68,10 @@ public class SecurityConfig {
         return defaultSecurityFilterChain;
     }
 
-	/*
-	@Override
-	protected void configure(HttpSecurity http) throws Exception {
-
-		http.
-				csrf()
-				.disable()
-				.authorizeHttpRequests()
-				.antMatchers(PUBLIC_URLS)
-				.permitAll()
-				.antMatchers(HttpMethod.GET)
-				.permitAll()
-				.anyRequest()
-				.authenticated()
-				.and().exceptionHandling()
-				.authenticationEntryPoint(this.jwtAuthenticationEntryPoint)
-				.and()
-				.sessionManagement()
-				.sessionCreationPolicy(SessionCreationPolicy.STATELESS);
-
-		http.addFilterBefore(this.jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
-
-	}
-
-	 */
-
-
-//    @Override
-//    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-//
-//        auth.userDetailsService(this.customUserDetailService).passwordEncoder(passwordEncoder());
-//
-//    }
-
-
-
-
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
-
-	/*
-	@Bean
-	@Override
-	public AuthenticationManager authenticationManagerBean() throws Exception {
-		return super.authenticationManagerBean();
-	}
-
-	 */
 
     @Bean
     public DaoAuthenticationProvider daoAuthenticationProvider() {
